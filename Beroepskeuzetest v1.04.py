@@ -64,6 +64,7 @@ questions = [
     "20. What does success mean to you?"
 ]
 
+# === Answers to questions A, B, C, D ===
 answer_options = [
     ["A) Structured and planned", "B) Spontaneous and creative", "C) Cooperative and social", "D) Goal-oriented and flexible"],
     ["A) Logic and order", "B) Creative freedom", "C) Helping others", "D) Winning and success"],
@@ -87,6 +88,7 @@ answer_options = [
     ["A) Mastery", "B) Expression", "C) Connection", "D) Achievement"]
 ]
 
+# === Character type A, B, C, D  ===
 labels = ['Type A', 'Type B', 'Type C', 'Type D']
 descriptions = {
     'Type A': 'Analytical and structured – great for research, data or technical jobs.',
@@ -137,6 +139,7 @@ user_df = pd.DataFrame([user_answers], columns=[f"Q{i+1}" for i in range(20)])
 user_prediction_encoded = model.predict(user_df)[0]
 user_prediction_label = label_encoder.inverse_transform([user_prediction_encoded])[0]
 
+# === Print to console ===
 print(f"\n🔍 Your personality type is: **{user_prediction_label}**")
 print(f"{descriptions[user_prediction_label]}")
 
@@ -149,6 +152,7 @@ for i, ans in enumerate(user_answers):
 user_type_prob = model.predict_proba(user_df)[0]
 class_labels = label_encoder.inverse_transform(np.arange(len(user_type_prob)))
 
+# === Print all anwesers ===
 print("\n📈 Probability per type:")
 for i, label in enumerate(class_labels):
     print(f"{label}: {user_type_prob[i]:.2%}")

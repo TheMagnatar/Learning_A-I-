@@ -4,7 +4,7 @@
     Dit script voorspelt een bepaalde uitkomst op basis van de vragen die worden beantwoord door de gebruiker.
     Het is een simpel voorbeeld van een machine learning algorytheme.
     
-    Bibliotheken waarvan dit script afhangelijk is.
+    Bibliotheken waarvan dit script afhangelijk zijn.
     
     SciKit bibliotheken voor gebruik van verschillende A.I. modellen.
     SciKit: https://scikit-learn.org/

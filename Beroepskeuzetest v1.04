@@ -24,6 +24,10 @@
     Seaborn: https://seaborn.pydata.org/
         pip install seaborn
 
+    Installeer alle bibliotheken in 1 keer.
+    pip install numpy pandas seaborn scikit-learn matplotlib
+
+
     Geschreven door: A.I. en Jos Severijnse.
 
 """
@@ -34,9 +38,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-# from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.preprocessing import LabelEncoder
 
-# Define questions and answer options
+# === Questions and answer options ===
 questions = [
     "1. How do you approach a new project?",
     "2. What motivates you the most?",
@@ -84,7 +88,6 @@ answer_options = [
 ]
 
 labels = ['Type A', 'Type B', 'Type C', 'Type D']
-
 descriptions = {
     'Type A': 'Analytical and structured – great for research, data or technical jobs.',
     'Type B': 'Creative and expressive – suited for arts, design, media.',
@@ -92,64 +95,69 @@ descriptions = {
     'Type D': 'Strategic and driven – fits leadership, business, or management.'
 }
 
-# Determine type based on dominant answer group
+# === Generate synthetic training data ===
 def determine_type(answers):
     counts = np.bincount(answers, minlength=5)[1:]
     return labels[np.argmax(counts)]
 
-# Genereer synthetische data voor training
-np.random.seed(42) # "The Hitchhiker's Guide to the Galaxy" van Douglas Adams waarin 42 het antwoord op het leven, het universum en alles is. Maar… niemand weet meer wat de vraag was. 🤯
+np.random.seed(42)  # Because 42 is the answer to life, the universe and everything (Douglas Adams 🪐)
 X = np.random.randint(1, 5, size=(500, 20))
-y = np.array([determine_type(row) for row in X])
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+y_labels = [determine_type(row) for row in X]
 
-# Train model
+# Encode string labels into numeric values
+label_encoder = LabelEncoder()
+y = label_encoder.fit_transform(y_labels)
+
+# === Train the model ===
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 model = RandomForestClassifier()
 model.fit(X_train, y_train)
 
-# Laat gebruiker de test invullen
-def run_beroepskeuzetest():
+# === Function to run the test ===
+def run_personality_test():
     answers = []
-    print("\n🧠 Beantwoord de volgende 20 vragen (A, B, C of D):\n")
+    print("\n🧠 Please answer the following 20 questions (A, B, C or D):\n")
     for i, question in enumerate(questions):
         print(f"{question}")
         for opt in answer_options[i]:
             print(opt)
         while True:
-            choice = input("Jouw keuze (A/B/C/D): ").strip().upper()
+            choice = input("Your choice (A/B/C/D): ").strip().upper()
             if choice in ['A', 'B', 'C', 'D']:
                 answers.append(['A', 'B', 'C', 'D'].index(choice) + 1)
                 break
             else:
-                print("Ongeldige keuze, probeer opnieuw.")
+                print("Invalid choice, please try again.")
         print()
     return answers
 
-user_answers = run_beroepskeuzetest()
+# === Run the test ===
+user_answers = run_personality_test()
 user_df = pd.DataFrame([user_answers], columns=[f"Q{i+1}" for i in range(20)])
-user_prediction = model.predict(user_df)[0]
+user_prediction_encoded = model.predict(user_df)[0]
+user_prediction_label = label_encoder.inverse_transform([user_prediction_encoded])[0]
 
-print(f"\n🔍 Jouw persoonlijkheidstype is: **{user_prediction}**")
-print(f"{descriptions[user_prediction]}")
+print(f"\n🔍 Your personality type is: **{user_prediction_label}**")
+print(f"{descriptions[user_prediction_label]}")
 
-# Resultaten voor de gebruiker
-print("\n📊 Jouw antwoorden overzicht:")
+# === Display user's answers ===
+print("\n📊 Overview of your answers:")
 for i, ans in enumerate(user_answers):
     print(f"{questions[i]} => {answer_options[i][ans-1]}")
 
-# Statistieken voor alleen deze ene gebruiker
-user_type_pred = model.predict(user_df)
+# === Show probability distribution ===
 user_type_prob = model.predict_proba(user_df)[0]
+class_labels = label_encoder.inverse_transform(np.arange(len(user_type_prob)))
 
-print("\n📈 Waarschijnlijkheden per type:")
-for i, label in enumerate(model.classes_):
+print("\n📈 Probability per type:")
+for i, label in enumerate(class_labels):
     print(f"{label}: {user_type_prob[i]:.2%}")
 
-# Visualisatie: persoonlijkheidstype van gebruiker
-sns.barplot(x=model.classes_, y=user_type_prob)
-plt.title("Voorspelde kans per persoonlijkheidstype")
-plt.ylabel("Waarschijnlijkheid")
-plt.xlabel("Persoonlijkheidstype")
+# === Visualization ===
+sns.barplot(x=class_labels, y=user_type_prob)
+plt.title("Predicted probability per personality type")
+plt.ylabel("Probability")
+plt.xlabel("Personality type")
 plt.ylim(0, 1)
 plt.tight_layout()
 plt.show()

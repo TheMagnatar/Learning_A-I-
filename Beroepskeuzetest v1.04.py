@@ -102,6 +102,26 @@ def determine_type(answers):
     counts = np.bincount(answers, minlength=5)[1:]
     return labels[np.argmax(counts)]
 
+# === Function to run the test ===
+def run_personality_test():
+    answers = []
+    print("\n🧠 Please answer the following 20 questions (A, B, C or D):\n")
+    
+    for i, question in enumerate(questions):
+        print(f"{question}")
+        for opt in answer_options[i]:
+            print(opt)
+        while True:
+            choice = input("Your choice (A/B/C/D): ").strip().upper()
+            if choice in ['A', 'B', 'C', 'D']:
+                answers.append(['A', 'B', 'C', 'D'].index(choice) + 1)
+                break
+            else:
+                print("Invalid choice, please try again.")
+        print()
+        
+    return answers
+
 np.random.seed(42)  # Because 42 is the answer to life, the universe and everything (Douglas Adams 🪐)
 X = np.random.randint(1, 5, size=(500, 20))
 y_labels = [determine_type(row) for row in X]
@@ -115,24 +135,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 model = RandomForestClassifier()
 model.fit(X_train, y_train)
 
-# === Function to run the test ===
-def run_personality_test():
-    answers = []
-    print("\n🧠 Please answer the following 20 questions (A, B, C or D):\n")
-    for i, question in enumerate(questions):
-        print(f"{question}")
-        for opt in answer_options[i]:
-            print(opt)
-        while True:
-            choice = input("Your choice (A/B/C/D): ").strip().upper()
-            if choice in ['A', 'B', 'C', 'D']:
-                answers.append(['A', 'B', 'C', 'D'].index(choice) + 1)
-                break
-            else:
-                print("Invalid choice, please try again.")
-        print()
-    return answers
-
 # === Run the test ===
 user_answers = run_personality_test()
 user_df = pd.DataFrame([user_answers], columns=[f"Q{i+1}" for i in range(20)])
@@ -143,7 +145,7 @@ user_prediction_label = label_encoder.inverse_transform([user_prediction_encoded
 print(f"\n🔍 Your personality type is: **{user_prediction_label}**")
 print(f"{descriptions[user_prediction_label]}")
 
-# === Display user's answers ===
+# === Display all user's answers ===
 print("\n📊 Overview of your answers:")
 for i, ans in enumerate(user_answers):
     print(f"{questions[i]} => {answer_options[i][ans-1]}")
@@ -152,7 +154,7 @@ for i, ans in enumerate(user_answers):
 user_type_prob = model.predict_proba(user_df)[0]
 class_labels = label_encoder.inverse_transform(np.arange(len(user_type_prob)))
 
-# === Print all anwesers ===
+# === Print probebillity ===
 print("\n📈 Probability per type:")
 for i, label in enumerate(class_labels):
     print(f"{label}: {user_type_prob[i]:.2%}")

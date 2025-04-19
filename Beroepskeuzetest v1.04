@@ -1,0 +1,155 @@
+"""
+    Beroepskeuzetest v1.04
+
+    Dit script voorspelt een bepaalde uitkomst op basis van de vragen die worden beantwoord door de gebruiker.
+    Het is een simpel voorbeeld van een machine learning algorytheme.
+    
+    Bibliotheken waarvan dit script afhangelijk is.
+    
+    SciKit bibliotheken voor gebruik van verschillende A.I. modellen.
+    SciKit: https://scikit-learn.org/
+        python -m venv sklearn-env
+        sklearn-env\Scripts\activate
+        pip install -U scikit-learn
+    
+    Om je data te annaliseren, moet Pandas ook geinstalleerd zijn.
+    Pandas: https://pandas.pydata.org/
+        pip install pandas
+
+    Voor wetenshcappelijke berekeningen moet Numpy geinstalleerd zijn.
+    Numpy: https://numpy.org/
+        pip install numpy
+
+    Om de date weer te geven in een gui gebruik je Seaborn.
+    Seaborn: https://seaborn.pydata.org/
+        pip install seaborn
+
+    Geschreven door: A.I. en Jos Severijnse.
+
+"""
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+# from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+# Define questions and answer options
+questions = [
+    "1. How do you approach a new project?",
+    "2. What motivates you the most?",
+    "3. How do you prefer to collaborate?",
+    "4. What do you do when something fails?",
+    "5. What describes you best?",
+    "6. How do you solve a problem?",
+    "7. How do you make decisions?",
+    "8. What do you value in a task?",
+    "9. What defines your way of thinking?",
+    "10. What do you do when you're bored?",
+    "11. What's your role in a team?",
+    "12. What do you seek in a job?",
+    "13. How do you handle a deadline?",
+    "14. How do you deal with criticism?",
+    "15. What's your greatest strength?",
+    "16. What do you value in colleagues?",
+    "17. What do you do under stress?",
+    "18. How do you prefer to learn?",
+    "19. What kind of work suits you?",
+    "20. What does success mean to you?"
+]
+
+answer_options = [
+    ["A) Structured and planned", "B) Spontaneous and creative", "C) Cooperative and social", "D) Goal-oriented and flexible"],
+    ["A) Logic and order", "B) Creative freedom", "C) Helping others", "D) Winning and success"],
+    ["A) Independently", "B) With inspiration", "C) In groups", "D) With clear roles"],
+    ["A) Analyze the mistake", "B) Try a new method", "C) Ask for help", "D) Push forward harder"],
+    ["A) Precise", "B) Expressive", "C) Caring", "D) Ambitious"],
+    ["A) With research", "B) With intuition", "C) With others", "D) With action"],
+    ["A) After thinking", "B) Based on feelings", "C) With feedback", "D) Quickly"],
+    ["A) Perfection", "B) Creativity", "C) Meaning", "D) Results"],
+    ["A) Logical", "B) Abstract", "C) Emotional", "D) Strategic"],
+    ["A) Read or study", "B) Create something", "C) Talk to people", "D) Set a goal"],
+    ["A) Planner", "B) Idea-generator", "C) Supporter", "D) Leader"],
+    ["A) Stability", "B) Freedom", "C) Purpose", "D) Challenge"],
+    ["A) Start early", "B) Improvise", "C) Ask for help", "D) Work under pressure"],
+    ["A) Reflect and improve", "B) Defend your idea", "C) Listen openly", "D) Use it as fuel"],
+    ["A) Focus", "B) Imagination", "C) Compassion", "D) Drive"],
+    ["A) Reliability", "B) Humor", "C) Support", "D) Results"],
+    ["A) Stay calm and think", "B) Find creative solutions", "C) Talk it through", "D) Take control"],
+    ["A) With books", "B) By doing", "C) With others", "D) Through results"],
+    ["A) Research work", "B) Artistic work", "C) Social work", "D) Business work"],
+    ["A) Mastery", "B) Expression", "C) Connection", "D) Achievement"]
+]
+
+labels = ['Type A', 'Type B', 'Type C', 'Type D']
+
+descriptions = {
+    'Type A': 'Analytical and structured – great for research, data or technical jobs.',
+    'Type B': 'Creative and expressive – suited for arts, design, media.',
+    'Type C': 'Empathetic and social – perfect for healthcare, education, support roles.',
+    'Type D': 'Strategic and driven – fits leadership, business, or management.'
+}
+
+# Determine type based on dominant answer group
+def determine_type(answers):
+    counts = np.bincount(answers, minlength=5)[1:]
+    return labels[np.argmax(counts)]
+
+# Genereer synthetische data voor training
+np.random.seed(42) # "The Hitchhiker's Guide to the Galaxy" van Douglas Adams waarin 42 het antwoord op het leven, het universum en alles is. Maar… niemand weet meer wat de vraag was. 🤯
+X = np.random.randint(1, 5, size=(500, 20))
+y = np.array([determine_type(row) for row in X])
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Train model
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+# Laat gebruiker de test invullen
+def run_beroepskeuzetest():
+    answers = []
+    print("\n🧠 Beantwoord de volgende 20 vragen (A, B, C of D):\n")
+    for i, question in enumerate(questions):
+        print(f"{question}")
+        for opt in answer_options[i]:
+            print(opt)
+        while True:
+            choice = input("Jouw keuze (A/B/C/D): ").strip().upper()
+            if choice in ['A', 'B', 'C', 'D']:
+                answers.append(['A', 'B', 'C', 'D'].index(choice) + 1)
+                break
+            else:
+                print("Ongeldige keuze, probeer opnieuw.")
+        print()
+    return answers
+
+user_answers = run_beroepskeuzetest()
+user_df = pd.DataFrame([user_answers], columns=[f"Q{i+1}" for i in range(20)])
+user_prediction = model.predict(user_df)[0]
+
+print(f"\n🔍 Jouw persoonlijkheidstype is: **{user_prediction}**")
+print(f"{descriptions[user_prediction]}")
+
+# Resultaten voor de gebruiker
+print("\n📊 Jouw antwoorden overzicht:")
+for i, ans in enumerate(user_answers):
+    print(f"{questions[i]} => {answer_options[i][ans-1]}")
+
+# Statistieken voor alleen deze ene gebruiker
+user_type_pred = model.predict(user_df)
+user_type_prob = model.predict_proba(user_df)[0]
+
+print("\n📈 Waarschijnlijkheden per type:")
+for i, label in enumerate(model.classes_):
+    print(f"{label}: {user_type_prob[i]:.2%}")
+
+# Visualisatie: persoonlijkheidstype van gebruiker
+sns.barplot(x=model.classes_, y=user_type_prob)
+plt.title("Voorspelde kans per persoonlijkheidstype")
+plt.ylabel("Waarschijnlijkheid")
+plt.xlabel("Persoonlijkheidstype")
+plt.ylim(0, 1)
+plt.tight_layout()
+plt.show()

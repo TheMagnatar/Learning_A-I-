@@ -1,5 +1,5 @@
 """
-    Beroepskeuzetest v1.05
+    Beroepskeuzetest v1.06
 
     Dit script voorspelt een bepaalde uitkomst op basis van de vragen die worden beantwoord door de gebruiker.
     Het is een simpel voorbeeld van een machine learning algorytheme.

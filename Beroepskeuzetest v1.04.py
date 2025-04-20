@@ -1,35 +1,33 @@
 """
-    Beroepskeuzetest v1.06
+    Career Choice Test v1.07
 
-    Dit script voorspelt een bepaalde uitkomst op basis van de vragen die worden beantwoord door de gebruiker.
-    Het is een simpel voorbeeld van een machine learning algorytheme.
-    
-    Bibliotheken waarvan dit script afhangelijk zijn.
-    
-    SciKit bibliotheken voor gebruik van verschillende A.I. modellen.
+    This script predicts a personality outcome based on user responses.
+    It demonstrates a basic example of a machine learning classification model.
+
+    Required libraries:
+
+    SciKit libraries for machine learning models.
     SciKit: https://scikit-learn.org/
         python -m venv sklearn-env
         sklearn-env\Scripts\activate
         pip install -U scikit-learn
-    
-    Om je data te annaliseren, moet Pandas ook geinstalleerd zijn.
+
+    Pandas is required for data analysis.
     Pandas: https://pandas.pydata.org/
         pip install pandas
 
-    Voor wetenshcappelijke berekeningen moet Numpy geinstalleerd zijn.
+    Numpy is required for scientific calculations.
     Numpy: https://numpy.org/
         pip install numpy
 
-    Om de date weer te geven in een gui gebruik je Seaborn.
+    Seaborn is used to visualize the results in a GUI.
     Seaborn: https://seaborn.pydata.org/
         pip install seaborn
 
-    Installeer alle bibliotheken in 1 keer.
+    Install all libraries at once:
     pip install numpy pandas seaborn scikit-learn matplotlib
 
-
-    Geschreven door: A.I. en Jos Severijnse.
-
+    Written by: A.I. and Jos Severijnse.
 """
 
 import numpy as np
@@ -37,10 +35,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Trait dimensions we'll track
 traits = ["Analytical", "Creative", "Empathetic", "Strategic"]
 
-# Define questions and answers with associated trait weights
 questions = [
     "1. How do you approach a new project?",
     "2. What motivates you the most?",
@@ -64,31 +60,130 @@ questions = [
     "20. What does success mean to you?"
 ]
 
-# Each answer increases the score of a specific trait
+# Meer psychologische nuance per antwoord
 answer_options = [
-    [("A) Structured and planned", "Analytical"), ("B) Spontaneous and creative", "Creative"), ("C) Cooperative and social", "Empathetic"), ("D) Goal-oriented and flexible", "Strategic")],
-    [("A) Logic and order", "Analytical"), ("B) Creative freedom", "Creative"), ("C) Helping others", "Empathetic"), ("D) Winning and success", "Strategic")],
-    [("A) Independently", "Analytical"), ("B) With inspiration", "Creative"), ("C) In groups", "Empathetic"), ("D) With clear roles", "Strategic")],
-    [("A) Analyze the mistake", "Analytical"), ("B) Try a new method", "Creative"), ("C) Ask for help", "Empathetic"), ("D) Push forward harder", "Strategic")],
-    [("A) Precise", "Analytical"), ("B) Expressive", "Creative"), ("C) Caring", "Empathetic"), ("D) Ambitious", "Strategic")],
-    [("A) With research", "Analytical"), ("B) With intuition", "Creative"), ("C) With others", "Empathetic"), ("D) With action", "Strategic")],
-    [("A) After thinking", "Analytical"), ("B) Based on feelings", "Creative"), ("C) With feedback", "Empathetic"), ("D) Quickly", "Strategic")],
-    [("A) Perfection", "Analytical"), ("B) Creativity", "Creative"), ("C) Meaning", "Empathetic"), ("D) Results", "Strategic")],
-    [("A) Logical", "Analytical"), ("B) Abstract", "Creative"), ("C) Emotional", "Empathetic"), ("D) Strategic", "Strategic")],
-    [("A) Read or study", "Analytical"), ("B) Create something", "Creative"), ("C) Talk to people", "Empathetic"), ("D) Set a goal", "Strategic")],
-    [("A) Planner", "Analytical"), ("B) Idea-generator", "Creative"), ("C) Supporter", "Empathetic"), ("D) Leader", "Strategic")],
-    [("A) Stability", "Analytical"), ("B) Freedom", "Creative"), ("C) Purpose", "Empathetic"), ("D) Challenge", "Strategic")],
-    [("A) Start early", "Analytical"), ("B) Improvise", "Creative"), ("C) Ask for help", "Empathetic"), ("D) Work under pressure", "Strategic")],
-    [("A) Reflect and improve", "Analytical"), ("B) Defend your idea", "Creative"), ("C) Listen openly", "Empathetic"), ("D) Use it as fuel", "Strategic")],
-    [("A) Focus", "Analytical"), ("B) Imagination", "Creative"), ("C) Compassion", "Empathetic"), ("D) Drive", "Strategic")],
-    [("A) Reliability", "Analytical"), ("B) Humor", "Creative"), ("C) Support", "Empathetic"), ("D) Results", "Strategic")],
-    [("A) Stay calm and think", "Analytical"), ("B) Find creative solutions", "Creative"), ("C) Talk it through", "Empathetic"), ("D) Take control", "Strategic")],
-    [("A) With books", "Analytical"), ("B) By doing", "Creative"), ("C) With others", "Empathetic"), ("D) Through results", "Strategic")],
-    [("A) Research work", "Analytical"), ("B) Artistic work", "Creative"), ("C) Social work", "Empathetic"), ("D) Business work", "Strategic")],
-    [("A) Mastery", "Analytical"), ("B) Expression", "Creative"), ("C) Connection", "Empathetic"), ("D) Achievement", "Strategic")]
+    [
+        ("A) Structured and planned", {"Analytical": 1.0}),
+        ("B) Spontaneous and creative", {"Creative": 0.9, "Empathetic": 0.1}),
+        ("C) Cooperative and social", {"Empathetic": 1.0}),
+        ("D) Goal-oriented and flexible", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Logic and order", {"Analytical": 1.0}),
+        ("B) Creative freedom", {"Creative": 1.0}),
+        ("C) Helping others", {"Empathetic": 1.0}),
+        ("D) Winning and success", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Independently", {"Analytical": 0.9, "Strategic": 0.1}),
+        ("B) With inspiration", {"Creative": 1.0}),
+        ("C) In groups", {"Empathetic": 1.0}),
+        ("D) With clear roles", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Analyze the mistake", {"Analytical": 1.0}),
+        ("B) Try a new method", {"Creative": 1.0}),
+        ("C) Ask for help", {"Empathetic": 1.0}),
+        ("D) Push forward harder", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Precise", {"Analytical": 1.0}),
+        ("B) Expressive", {"Creative": 1.0}),
+        ("C) Caring", {"Empathetic": 1.0}),
+        ("D) Ambitious", {"Strategic": 1.0})
+    ],
+    [
+        ("A) With research", {"Analytical": 1.0}),
+        ("B) With intuition", {"Creative": 0.8, "Empathetic": 0.2}),
+        ("C) With others", {"Empathetic": 1.0}),
+        ("D) With action", {"Strategic": 1.0})
+    ],
+    [
+        ("A) After thinking", {"Analytical": 1.0}),
+        ("B) Based on feelings", {"Creative": 0.7, "Empathetic": 0.3}),
+        ("C) With feedback", {"Empathetic": 1.0}),
+        ("D) Quickly", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Perfection", {"Analytical": 1.0}),
+        ("B) Creativity", {"Creative": 1.0}),
+        ("C) Meaning", {"Empathetic": 1.0}),
+        ("D) Results", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Logical", {"Analytical": 1.0}),
+        ("B) Abstract", {"Creative": 1.0}),
+        ("C) Emotional", {"Empathetic": 1.0}),
+        ("D) Strategic", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Read or study", {"Analytical": 1.0}),
+        ("B) Create something", {"Creative": 1.0}),
+        ("C) Talk to people", {"Empathetic": 1.0}),
+        ("D) Set a goal", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Planner", {"Analytical": 1.0}),
+        ("B) Idea-generator", {"Creative": 1.0}),
+        ("C) Supporter", {"Empathetic": 1.0}),
+        ("D) Leader", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Stability", {"Analytical": 1.0}),
+        ("B) Freedom", {"Creative": 1.0}),
+        ("C) Purpose", {"Empathetic": 1.0}),
+        ("D) Challenge", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Start early", {"Analytical": 1.0}),
+        ("B) Improvise", {"Creative": 1.0}),
+        ("C) Ask for help", {"Empathetic": 1.0}),
+        ("D) Work under pressure", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Reflect and improve", {"Analytical": 1.0}),
+        ("B) Defend your idea", {"Creative": 0.8, "Strategic": 0.2}),
+        ("C) Listen openly", {"Empathetic": 1.0}),
+        ("D) Use it as fuel", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Focus", {"Analytical": 1.0}),
+        ("B) Imagination", {"Creative": 1.0}),
+        ("C) Compassion", {"Empathetic": 1.0}),
+        ("D) Drive", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Reliability", {"Analytical": 1.0}),
+        ("B) Humor", {"Creative": 0.9, "Empathetic": 0.1}),
+        ("C) Support", {"Empathetic": 1.0}),
+        ("D) Results", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Stay calm and think", {"Analytical": 1.0}),
+        ("B) Find creative solutions", {"Creative": 1.0}),
+        ("C) Talk it through", {"Empathetic": 1.0}),
+        ("D) Take control", {"Strategic": 1.0})
+    ],
+    [
+        ("A) With books", {"Analytical": 1.0}),
+        ("B) By doing", {"Creative": 1.0}),
+        ("C) With others", {"Empathetic": 1.0}),
+        ("D) Through results", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Research work", {"Analytical": 1.0}),
+        ("B) Artistic work", {"Creative": 1.0}),
+        ("C) Social work", {"Empathetic": 1.0}),
+        ("D) Business work", {"Strategic": 1.0})
+    ],
+    [
+        ("A) Mastery", {"Analytical": 1.0}),
+        ("B) Expression", {"Creative": 1.0}),
+        ("C) Connection", {"Empathetic": 1.0}),
+        ("D) Achievement", {"Strategic": 1.0})
+    ]
 ]
 
-# Map dominant traits to personality types
 type_mapping = {
     "Analytical": "Type A",
     "Creative": "Type B",
@@ -103,9 +198,8 @@ descriptions = {
     'Type D': 'Strategic and driven – fits leadership, business, or management.'
 }
 
-# Collect answers and score traits
 def run_test():
-    trait_scores = dict.fromkeys(traits, 0)
+    trait_scores = dict.fromkeys(traits, 0.0)
     print("\n🧠 Answer the following 20 questions (A, B, C or D):\n")
     for i, question in enumerate(questions):
         print(question)
@@ -115,15 +209,15 @@ def run_test():
             choice = input("Your choice (A/B/C/D): ").strip().upper()
             if choice in ['A', 'B', 'C', 'D']:
                 index = ['A', 'B', 'C', 'D'].index(choice)
-                chosen_trait = answer_options[i][index][1]
-                trait_scores[chosen_trait] += 1
+                chosen_weights = answer_options[i][index][1]
+                for trait, weight in chosen_weights.items():
+                    trait_scores[trait] += weight
                 break
             else:
                 print("Invalid choice, try again.")
         print()
     return trait_scores
 
-# Determine dominant trait and corresponding type
 def determine_type(trait_scores):
     dominant_trait = max(trait_scores, key=trait_scores.get)
     return type_mapping[dominant_trait], dominant_trait
@@ -135,12 +229,10 @@ personality_type, main_trait = determine_type(scores)
 print(f"\n🔍 Your personality type is: **{personality_type}**")
 print(f"{descriptions[personality_type]}")
 
-# Show scores per trait
 print("\n📊 Trait analysis:")
 for trait, score in scores.items():
-    print(f"{trait}: {score}/20")
+    print(f"{trait}: {score:.1f}/20")
 
-# Bar chart of traits
 sns.barplot(x=list(scores.keys()), y=list(scores.values()))
 plt.title("Psychological Trait Distribution")
 plt.ylabel("Score")

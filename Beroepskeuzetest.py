@@ -60,7 +60,6 @@ questions = [
     "20. What does success mean to you?"
 ]
 
-# Meer psychologische nuance per antwoord
 answer_options = [
     [
         ("A) Structured and planned", {"Analytical": 1.0}),

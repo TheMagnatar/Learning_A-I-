@@ -27,7 +27,7 @@
     Install all libraries at once:
     pip install numpy pandas seaborn scikit-learn matplotlib
 
-    Written by: Jos Severijnse.
+     Written by: A.I. and Jos Severijnse.
 """
 import numpy as np
 import pandas as pd
